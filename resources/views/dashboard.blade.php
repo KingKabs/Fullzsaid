@@ -15,14 +15,9 @@
                     <h4 class="mb-3">Welcome, {{ Auth::user()->name }}!</h4>
                     <p class="mb-4">Here you can manage your account, view persons, and access other features.</p>
 
-                    <!-- Quick Action Buttons -->
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('persons.index') }}" class="btn btn-info btn-sm">
-                            View Persons
-                        </a>
-                        <!-- Example: future button -->
-                        <!-- <a href="#" class="btn btn-success btn-lg">Wallet / Purchases</a> -->
-                    </div>
+                    <p><strong>Wallet Balance:</strong> ${{ number_format(Auth::user()->wallet_balance, 2) }}</p>
+                    <p><strong>Wallet Address:</strong> {{ Auth::user()->wallet_address }}</p>
+                    <a href="{{ route('wallet.index') }}" class="btn btn-info">Top-Up Wallet</a>                    
 
                 </div>
             </div>
