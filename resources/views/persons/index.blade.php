@@ -6,9 +6,15 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">Persons</h2>
+
+        @auth
+        @if(auth()->user()->isAdmin())
         <a href="{{ route('persons.create') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle"></i> Add Person
         </a>
+        @endif
+        @endauth
+
     </div>
 
     <!-- Success Message -->
@@ -47,10 +53,20 @@
                 <thead class="table-light">
                     <tr>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Country</th>
+                        <th>DOB</th>
+                        <th>State</th>
                         <th>City</th>
-                        <th>Purchase Date</th>
+                        <th>Zip</th>
+                        <th>Email</th>
+                        <th>Email Pass</th>
+                        <th>FA Username</th>
+                        <th>FA Pass</th>
+                        <th>Backup Code</th>
+                        <th>Security QA</th>
+                        <th>Country</th>
+                        <th>Description</th>
+                        <th>SSN</th>
+                        <th>CS</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -58,11 +74,25 @@
                     @forelse($persons as $p)
                     <tr>
                         <td>{{ $p->firstName }} {{ $p->lastName }}</td>
-                        <td>{{ $p->email }}</td>
-                        <td>{{ $p->country }}</td>
+                        <td>{{ $p->dob ? \Carbon\Carbon::parse($p->dob)->year : '' }}</td>
+                        <td>{{ $p->state }}</td>
                         <td>{{ $p->city }}</td>
-                        <td>{{ $p->purchaseDate }}</td>
-                        <td class="text-end">
+                        <td>{{ $p->zip }}</td>
+
+                        {{-- Masked fields with checkmark if value exists --}}
+                        <td class="text-center">{!! $p->email ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->emailPass ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->faUname ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->faPass ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->backupCode ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->securityQa ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->country ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->description ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->ssn ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">{!! $p->cs ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+
+                        {{-- Actions --}}
+                        <td class="text-end" style="white-space: nowrap;">
                             <div class="btn-group" role="group" aria-label="Actions">
                                 @if(auth()->user()->isAdmin())
                                 <a href="{{ route('persons.show', $p) }}" class="btn btn-sm btn-outline-info"> <i class="bi bi-eye"></i></a>
@@ -80,20 +110,18 @@
                                     <button class="btn btn-sm btn-primary">Add <i class="bi bi-cart-plus"></i></button>
                                 </form>
                                 @endif
-
                                 @endif
                             </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">
-                            No persons found.
-                        </td>
+                        <td colspan="17" class="text-center py-4 text-muted">No persons found.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
+
         </div>
     </div>
 

@@ -27,7 +27,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Amount (USD)</label>
-                            <input type="number" name="amount" class="form-control" min="1" required>
+                            <input type="number" name="amount" class="form-control" min="10" required>
                         </div>
 
                         <div class="d-grid gap-2">
