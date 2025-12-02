@@ -135,6 +135,12 @@
                                 </a>
                             </li>
 
+                            <!--li class="nav-item">
+                                <a class="nav-link" href="{{ route('support.index') }}">
+                                    <i class="bi bi-headset"></i> Support
+                                </a>
+                            </li-->
+
                             <li class="nav-item">
                                 <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                                     <i class="bi bi-cart"></i> Cart

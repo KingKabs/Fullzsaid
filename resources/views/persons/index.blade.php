@@ -67,6 +67,7 @@
                         <th>Description</th>
                         <th>SSN</th>
                         <th>CS</th>
+                        <th>Price</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -90,6 +91,7 @@
                         <td class="text-center">{!! $p->description ? '<i class="bi bi-check2"></i>' : '' !!}</td>
                         <td class="text-center">{!! $p->ssn ? '<i class="bi bi-check2"></i>' : '' !!}</td>
                         <td class="text-center">{!! $p->cs ? '<i class="bi bi-check2"></i>' : '' !!}</td>
+                        <td class="text-center">${{ $p->price }}</td>
 
                         {{-- Actions --}}
                         <td class="text-end" style="white-space: nowrap;">

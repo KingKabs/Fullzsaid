@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->string('cs')->nullable();
             $table->string('city')->nullable();
             $table->date('purchaseDate')->nullable();
+            $table->decimal('price', 10, 2)->default(1);
             $table->boolean('is_sold')->default(false);
 
             $table->timestamps();

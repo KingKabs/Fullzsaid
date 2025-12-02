@@ -6,6 +6,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\SupportController;
 
 /*
   |--------------------------------------------------------------------------
@@ -55,6 +56,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [OrdersController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrdersController::class, 'show'])->name('orders.show');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/support', [SupportController::class, 'index'])->name('support.index');
+    Route::post('/support', [SupportController::class, 'store'])->name('support.store');
 });
 
 Route::post('/wallet/test/{paymentId}', [WalletController::class, 'testPayment']);
