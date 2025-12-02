@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class PersonController extends Controller {
 
     public function index() {
-        $query = Person::query();
+        $query = Person::where('is_sold', false); // only show available items
 
         if (request('search')) {
             $search = request('search');

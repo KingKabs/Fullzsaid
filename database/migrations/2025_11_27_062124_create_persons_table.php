@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->string('cs')->nullable();
             $table->string('city')->nullable();
             $table->date('purchaseDate')->nullable();
+            $table->boolean('is_sold')->default(false);
 
             $table->timestamps();
             $table->softDeletes();

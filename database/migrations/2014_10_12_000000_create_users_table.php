@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('user');
 
             // Extra fields for crypto wallet
             $table->decimal('wallet_balance', 15, 2)->default(0); // store as decimal

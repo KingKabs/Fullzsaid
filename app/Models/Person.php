@@ -19,4 +19,12 @@ class Person extends Model {
         'cs', 'city', 'purchaseDate'
     ];
     protected $dates = ['dob', 'purchaseDate'];
+
+    public function cartItems() {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems() {
+        return $this->hasMany(OrderItem::class);
+    }
 }

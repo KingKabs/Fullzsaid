@@ -63,25 +63,26 @@
                         <td>{{ $p->city }}</td>
                         <td>{{ $p->purchaseDate }}</td>
                         <td class="text-end">
-                            <a href="{{ route('persons.show', $p) }}"
-                               class="btn btn-sm btn-outline-info me-1">
-                                View
-                            </a>
+                            <div class="btn-group" role="group" aria-label="Actions">
+                                @if(auth()->user()->isAdmin())
+                                <a href="{{ route('persons.show', $p) }}" class="btn btn-sm btn-outline-info"> <i class="bi bi-eye"></i></a>
+                                <a href="{{ route('persons.edit', $p) }}" class="btn btn-sm btn-outline-warning"> <i class="bi bi-pencil-square"></i></a>
+                                <form action="{{ route('persons.destroy', $p) }}" method="POST" onsubmit="return confirm('Delete this entry?')">
+                                    @csrf @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                                @else
+                                @if(isset(session('cart')[$p->id]))
+                                <button class="btn btn-sm btn-secondary" disabled>Added <i class="bi bi-check2"></i></button>
+                                @else
+                                <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button class="btn btn-sm btn-primary">Add <i class="bi bi-cart-plus"></i></button>
+                                </form>
+                                @endif
 
-                            <a href="{{ route('persons.edit', $p) }}"
-                               class="btn btn-sm btn-outline-warning me-1">
-                                Edit
-                            </a>
-
-                            <form action="{{ route('persons.destroy', $p) }}"
-                                  method="POST"
-                                  class="d-inline">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Delete this entry?')">
-                                    Delete
-                                </button>
-                            </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
