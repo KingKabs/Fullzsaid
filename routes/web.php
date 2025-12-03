@@ -40,8 +40,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::get('/wallet/topup', [WalletController::class, 'topUpForm'])->name('wallet.topup');
     Route::post('/wallet/create-invoice', [WalletController::class, 'createInvoice'])->name('wallet.createInvoice');
+    Route::post('/wallet/create-payment', [WalletController::class, 'createPayment'])->name('wallet.createPayment');
     Route::post('/wallet/webhook', [WalletController::class, 'handleWebhook'])->name('wallet.webhook');
     Route::get('/wallet/success', [WalletController::class, 'success'])->name('wallet.success');
+    // Check payment status (AJAX)
+    Route::get('/wallet/payment-status/{payment}', [WalletController::class, 'checkPaymentStatus'])->name('wallet.payment.status');
+});
+
+Route::get('/nowpayments/status/{paymentId}', [WalletController::class, 'getPaymentStatus'])
+        ->name('nowpayments.status');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payments', [App\Http\Controllers\PaymentsController::class, 'index'])
+            ->name('payments.index');
 });
 
 Route::middleware(['auth'])->group(function () {

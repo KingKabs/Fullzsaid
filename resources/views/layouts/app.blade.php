@@ -166,6 +166,10 @@
                                     <a class="dropdown-item" href="{{ route('dashboard') }}">
                                         <i class="bi bi-speedometer2"></i> My Account
                                     </a>
+                                    
+                                    <a class="dropdown-item" href="{{ route('payments.index') }}">
+                                        <i class="bi bi-credit-card"></i> My Transactions
+                                    </a>
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

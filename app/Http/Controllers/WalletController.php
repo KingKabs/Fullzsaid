@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Models\Payment;
 
 class WalletController extends Controller {
     #NowPaymnts IPN secret key: DHLgS+E1fHUy40iqovLm2PSyKmL3yg2Z
@@ -48,34 +50,126 @@ class WalletController extends Controller {
         return back()->with('error', $data['message'] ?? 'Unable to create invoice.');
     }
 
-    public function handleWebhook(Request $request) {
-        $payload = $request->all();
+    public function createPayment(Request $request) {
+        $request->validate([
+            'crypto' => 'required|string',
+            'amount' => 'required|numeric|min:1',
+        ]);
 
-        if (!isset($payload['order_id'])) {
-            return response()->json(['error' => 'invalid'], 400);
+        $user = auth()->user();
+
+        $orderId = "wallet_{$user->id}_" . time();
+
+        // Step 1: Create payment via NOWPayments API
+        $response = Http::withHeaders([
+                    'x-api-key' => env('NOWPAYMENTS_API_KEY'),
+                    'Content-Type' => 'application/json'
+                ])->post('https://api.nowpayments.io/v1/payment', [
+            "price_amount" => $request->amount,
+            "price_currency" => "USD",
+            "pay_currency" => $request->crypto,
+            "order_id" => $orderId,
+            "order_description" => "Wallet top-up",
+        ]);
+
+        $data = $response->json();
+
+        if (!$response->successful() || !isset($data['payment_id'])) {
+            return back()->with('error', 'Payment creation failed.');
         }
 
-        // Extract user
-        preg_match('/wallet_(\d+)_/', $payload['order_id'], $matches);
-        if (!isset($matches[1])) {
-            return response()->json(['error' => 'invalid user'], 400);
+        // Step 2: Save payment record
+        $paymentModel = Payment::create([
+            'user_id' => $user->id,
+            'payment_id' => $data['payment_id'],
+            'order_id' => $orderId,
+            'pay_currency' => $request->crypto,
+            'price_amount' => $request->amount,
+            'pay_amount' => $data['pay_amount'] ?? null,
+            'pay_address' => $data['pay_address'] ?? null,
+            'status' => $data['payment_status'] ?? 'waiting'
+        ]);
+
+        // Step 3: Render the payment screen
+        return view('wallet.crypto_payment', [
+            'paymentApi' => $data, // array from API
+            'payment' => $paymentModel // model with DB ID
+        ]);
+    }
+
+    public function checkPaymentStatus(Payment $payment) {
+        $response = Http::withHeaders([
+                    'x-api-key' => env('NOWPAYMENTS_API_KEY'),
+                ])->get("https://api.nowpayments.io/v1/payment/{$payment->payment_id}");
+
+        if (!$response->successful()) {
+            return response()->json(['status' => 'error']);
         }
 
-        $user = \App\Models\User::find($matches[1]);
-        if (!$user) {
-            return response()->json(['error' => 'not found'], 404);
-        }
+        $data = $response->json();
 
-        // Only credit when finished
-        if ($payload['payment_status'] === 'finished') {
+        // Update DB
+        $payment->update([
+            'status' => $data['payment_status'],
+            'actually_paid' => $data['actually_paid'] ?? null,
+            'pay_amount' => $data['pay_amount'] ?? $payment->pay_amount,
+            'network' => $data['network'] ?? null,
+        ]);
 
-            $usdAmount = $payload['price_amount']; // always USD
-
-            $user->wallet_balance += $usdAmount;
+        // Auto-credit wallet if finished
+        if ($data['payment_status'] === 'finished') {
+            $user = $payment->user;
+            $user->wallet_balance += $payment->price_amount;
             $user->save();
         }
 
+        return response()->json([
+                    'status' => $data['payment_status'],
+                    'actually_paid' => $data['actually_paid'],
+        ]);
+    }
+
+    public function handleWebhook(Request $request) {
+        $payload = $request->all();
+
+        // Verify IPN secret (replace 'YOUR_IPN_SECRET' with your actual secret)
+        $ipnSecret = $request->header('x-nowpayments-sig') ?? $request->input('ipn_secret');
+        if ($ipnSecret !== env('NOWPAYMENTS_IPN_SECRET', 'DHLgS+E1fHUy40iqovLm2PSyKmL3yg2Z')) {
+            Log::warning('Invalid NowPayments IPN secret', $payload);
+            return response()->json(['error' => 'invalid secret'], 403);
+        }
+
+        // Log payload for inspection
+        Log::info('NowPayments Webhook:', $payload);
+
+        // Optional: also save to storage file
+        $logFile = storage_path('logs/nowpayments_webhook.log');
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " - " . json_encode($payload) . PHP_EOL, FILE_APPEND);
+
         return response()->json(['status' => 'ok']);
+    }
+
+    public function getPaymentStatus($paymentId) {
+        dd($paymentId);
+        $apiKey = env('NOWPAYMENTS_API_KEY'); // Your NowPayments API key
+        $url = "https://api.nowpayments.io/v1/payment/{$paymentId}";
+
+        $response = Http::withHeaders([
+                    'x-api-key' => $apiKey,
+                    'Content-Type' => 'application/json',
+                ])->get($url);
+
+        if ($response->failed()) {
+            Log::error('NowPayments API request failed', ['payment_id' => $paymentId, 'response' => $response->body()]);
+            return response()->json(['error' => 'API request failed'], 500);
+        }
+
+        $data = $response->json();
+
+        // Optional: log response for inspection
+        Log::info('NowPayments Payment Status:', $data);
+
+        return response()->json($data);
     }
 
     public function testPayment($paymentId) {
