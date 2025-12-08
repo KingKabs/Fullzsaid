@@ -7,6 +7,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\CoinPaymentsController;
 
 /*
   |--------------------------------------------------------------------------
@@ -54,6 +55,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payments', [App\Http\Controllers\PaymentsController::class, 'index'])
             ->name('payments.index');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/wallet/coinpayments/create', [CoinPaymentsController::class, 'createPayment'])
+            ->name('coinpayments.create');
+    Route::post('/wallet/coinpayments/create-invoice', [CoinPaymentsController::class, 'createInvoice'])
+            ->name('coinpayments.createInvoice');
+});
+
+Route::post('/wallet/coinpayments/ipn', [CoinPaymentsController::class, 'ipn'])
+        ->name('coinpayments.ipn');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

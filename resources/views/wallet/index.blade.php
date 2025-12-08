@@ -13,7 +13,7 @@
                 <div class="card-body p-4">
                     <p><strong>Current Balance:</strong> ${{ number_format($user->wallet_balance, 2) }}</p>
 
-                    <form method="POST" action="{{ route('wallet.createPayment') }}">
+                    <form method="POST" action="{{ route('coinpayments.createInvoice') }}">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Select Crypto</label>
