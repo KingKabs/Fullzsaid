@@ -13,6 +13,22 @@
                     </h3>
                 </div>
 
+                {{-- Success message --}}
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                {{-- Error message --}}
+                @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
                 <div class="box-body table-responsive">
 
                     <table class="table table-bordered table-striped table-hover">
@@ -31,6 +47,7 @@
                                 <th>Network</th>
                                 <th>Created At</th>
                                 <th>Updated At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
@@ -61,12 +78,12 @@
                                 </td>
 
                                 <td>
-                                    <span class="label
-                                          @if($payment->status === 'finished') label-success
-                                          @elseif($payment->status === 'confirming') label-info
-                                          @elseif($payment->status === 'pending') label-warning
-                                          @elseif($payment->status === 'expired') label-default
-                                          @else label-danger
+                                    <span class="badge
+                                          @if($payment->status === 'finished') bg-success
+                                          @elseif($payment->status === 'confirming') bg-info
+                                          @elseif($payment->status === 'pending') bg-warning
+                                          @elseif($payment->status === 'expired') bg-secondary
+                                          @else bg-danger
                                           @endif
                                           ">
                                         {{ ucfirst($payment->status) }}
@@ -78,10 +95,24 @@
 
                                 <td>{{ $payment->created_at->format('Y-m-d H:i') }}</td>
                                 <td>{{ $payment->updated_at->format('Y-m-d H:i') }}</td>
+                                <td style="white-space: nowrap;">
+                                    @if(in_array($payment->status, ['finished', 'expired']))
+                                    <button class="btn btn-sm btn-default" disabled>
+                                        <i class="fa fa-check"></i> Final
+                                    </button>
+                                    @else
+                                    <a href="{{ route('wallet.payment.status', $payment) }}"
+                                       class="btn btn-sm btn-primary"
+                                       onclick="return confirm('Check and update payment status from NOWPayments?');">
+                                        <i class="bi bi-arrow-clockwise"></i> Check Status
+                                    </a>
+                                    @endif
+                                </td>
+
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="13" class="text-center text-muted p-4">
+                                <td colspan="14" class="text-center text-muted p-4">
                                     <i class="fa fa-info-circle"></i> No payment records found.
                                 </td>
                             </tr>

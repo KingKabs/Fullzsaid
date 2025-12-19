@@ -50,7 +50,7 @@
                         <div class="mb-3">
                             <label class="form-label">Select Crypto</label>
                             <select name="crypto" class="form-select" required>
-                                <option value="USDTTRC20">USDT (TRC20)</option>
+                                <!--<option value="USDTTRC20">USDT (TRC20)</option>-->
                                 <option value="TRX">TRON (TRX)</option>
                             </select>
                         </div>
@@ -61,7 +61,7 @@
                                 type="number"
                                 name="amount"
                                 class="form-control"
-                                min="10"
+                                min="1"
                                 required
                                 value="{{ old('amount') }}"
                                 >
