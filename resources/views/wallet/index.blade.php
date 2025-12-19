@@ -11,36 +11,71 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <p><strong>Current Balance:</strong> ${{ number_format($user->wallet_balance, 2) }}</p>
 
-                    <form method="POST" action="{{ route('coinpayments.createInvoice') }}">
+                    {{-- Success message --}}
+                    @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    @endif
+
+                    {{-- Error message --}}
+                    @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    @endif
+
+                    {{-- Validation errors --}}
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <p class="mb-3">
+                        <strong>Current Balance:</strong>
+                        ${{ number_format($user->wallet_balance, 2) }}
+                    </p>
+
+                    <form method="POST" action="{{ route('wallet.createPayment') }}">
                         @csrf
+
                         <div class="mb-3">
                             <label class="form-label">Select Crypto</label>
                             <select name="crypto" class="form-select" required>
-                                <!--<option value="BTC">Bitcoin (BTC)</option>-->
-                                <!--<option value="ETH">Ethereum (ETH)</option>-->
                                 <option value="USDTTRC20">USDT (TRC20)</option>
-                                <!--<option value="USDTERC20">USDT (ERC20)</option>-->
+                                <option value="TRX">TRON (TRX)</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Amount (USD)</label>
-                            <input type="number" name="amount" class="form-control" min="10" required>
+                            <input
+                                type="number"
+                                name="amount"
+                                class="form-control"
+                                min="10"
+                                required
+                                value="{{ old('amount') }}"
+                                >
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-info btn-lg">Top-Up</button>
+                            <button type="submit" class="btn btn-info btn-lg">
+                                Top-Up
+                            </button>
                         </div>
                     </form>
 
                 </div>
             </div>
-
-            @if(session('success'))
-            <div class="alert alert-success mt-3">{{ session('success') }}</div>
-            @endif
 
         </div>
     </div>

@@ -70,6 +70,7 @@ class WalletController extends Controller {
             "pay_currency" => $request->crypto,
             "order_id" => $orderId,
             "order_description" => "Wallet top-up",
+            "is_fee_paid_by_user" => false
         ]);
 
         $data = $response->json();

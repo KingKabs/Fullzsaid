@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wallet/create-payment', [WalletController::class, 'createPayment'])->name('wallet.createPayment');
     Route::post('/wallet/webhook', [WalletController::class, 'handleWebhook'])->name('wallet.webhook');
     Route::get('/wallet/success', [WalletController::class, 'success'])->name('wallet.success');
+    Route::get('/wallet/cancel', [WalletController::class, 'cancel'])->name('wallet.cancel');
     // Check payment status (AJAX)
     Route::get('/wallet/payment-status/{payment}', [WalletController::class, 'checkPaymentStatus'])->name('wallet.payment.status');
 });
